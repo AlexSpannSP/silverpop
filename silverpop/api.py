@@ -216,12 +216,15 @@ class API(object):
             xml = xml_dict
         url = '%s;jsessionid=%s' % (self.url, self.sessionid) if not auth \
             else self.url
-        print url, xml
+
+        logger.debug("Sending request to: %s" % url)
 
         # Connect to silverpop and get our response
-        response = requests.post(self.url, data=xml,
+        response = requests.post(url, data=xml,
                            headers={"Content-Type": "text/xml;charset=utf-8"})
-        print response.content
+
+        logger.debug("Recieved response: %s" % response.content)
+
         response = ConvertXmlToDict(response.content, dict)
         response = response.get('Envelope', {}).get('Body')
 
