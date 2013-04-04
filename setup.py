@@ -13,10 +13,10 @@ setup(
     author='Thomas Welfley',
     author_email='thomas@yola.com',
     url='https://github.com/yola/silverpop',
-    packages= ['silverpop',],
+    packages=['silverpop', ],
     install_requires=[
-        'requests==0.7.3',
+        'requests==0.14.2',
         'elementtree==1.2.7-20070827-preview',
-        'testify==0.1.12',],
+        'testify==0.1.12', ],
     license='GPL',
 )
