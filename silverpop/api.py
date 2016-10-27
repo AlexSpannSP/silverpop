@@ -50,7 +50,7 @@ class API(object):
         }
         result, success = self._submit_request(xml)
 
-        return result
+        return result, success
 
     def add_recipient(self, list_id, email, data=None):
         """ Mask for add_user
@@ -71,7 +71,7 @@ class API(object):
                 'LIST_ID': list_id,
                 'CREATED_FROM': 2,
                 'COLUMN': [
-                    {'NAME':'EMAIL', 'VALUE':email}
+                    {'NAME':'EMAIL', 'VALUE': email}
                 ],
             }
         }
@@ -82,7 +82,7 @@ class API(object):
 
         result, success = self._submit_request(xml)
 
-        return success
+        return result, success
 
     def add_contact_to_contact_list(self, contact_list_id, contact_id=None, data=None):
         """ Adds a contact by contact_id or by performing a search based on
@@ -105,7 +105,7 @@ class API(object):
             xml['Envelope']['Body']['AddContactToContactList'].update({'COLUMN': self._data_to_columns(data)})
 
         result, success = self._submit_request(xml)
-        return success
+        return result, success
 
     def remove_rcipient(self, list_id, email):
         self.remove_user(list_id, email)
@@ -123,13 +123,13 @@ class API(object):
 
         result, success = self._submit_request(xml)
 
-        return success
+        return result, success
 
     def logout(self):
         raw_xml = """<Envelope><Body><Logout/></Body></Envelope>"""
         result, success = self._submit_request(raw_xml, raw_xml=True)
 
-        return success
+        return result, success
 
     def update_recipient(self, list_id, email, data):
         self.update_user(list_id, email, data)
@@ -155,7 +155,7 @@ class API(object):
 
         result, success = self._submit_request(xml)
 
-        return success
+        return result, success
 
     def opt_out_user(self, list_id, email):
         """ Opts a user out on the specified list.
@@ -170,7 +170,51 @@ class API(object):
 
         result, success = self._submit_request(xml)
 
-        return success
+        return result, success
+
+    def import_list(self, map_filename, list_filename):
+        """ Imports a Relational Table using a CSV and an XML mapping file, previously uploaded.
+            <Envelope>
+            <Body>
+            <ImportList>
+            <MAP_FILE>list_import_map.xml</MAP_FILE>
+            <SOURCE_FILE>list_create.csv</SOURCE_FILE>
+            </ImportList>
+            </Body>
+            </Envelope>
+
+        :return:
+        """
+        xml = self._get_xml_document()
+        xml['Envelope']['Body']['ImportList'] = {
+                'MAP_FILE': map_filename,
+                'SOURCE_FILE': list_filename,
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def import_table(self, map_filename, table_filename):
+        """ Imports a Relational Table using a CSV and an XML mapping file, previously uploaded.
+            <Envelope>
+            <Body>
+            <ImportTable>
+            <MAP_FILE>table_import_map.xml</MAP_FILE>
+            <SOURCE_FILE>table_create.csv</SOURCE_FILE>
+            </ImportTable>
+            </Body>
+            </Envelope>
+        """
+        xml = self._get_xml_document()
+        xml['Envelope']['Body']['ImportTable'] = {
+                'MAP_FILE': map_filename,
+                'SOURCE_FILE': table_filename,
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
 
     def _sanitize_columns_in_api_result(self, data):
         """ Post result parsing, the value of the columns key, if it exists,
