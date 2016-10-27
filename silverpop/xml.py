@@ -4,17 +4,17 @@
 #
 # I've modified it to make it work with python >=2.6 ~Thomas
 
-from elementtree import ElementTree
+from xml.etree import ElementTree
+
 
 class XmlDictObject(dict):
-    """
-    Adds object like functionality to the standard dictionary.
+    """ Adds object like functionality to the standard dictionary.
     """
 
     def __init__(self, initdict=None):
         if initdict is None:
             initdict = {}
-        dict.__init__(self, initdict)
+        super(XmlDictObject).__init__(initdict)
     
     def __getattr__(self, item):
         return self.__getitem__(item)
@@ -29,63 +29,62 @@ class XmlDictObject(dict):
             return ''
 
     @staticmethod
-    def Wrap(x):
+    def wrap(x):
+        """ Static method to wrap a dictionary recursively as an XmlDictObject
         """
-        Static method to wrap a dictionary recursively as an XmlDictObject
-        """
-
         if isinstance(x, dict):
-            return XmlDictObject((k, XmlDictObject.Wrap(v)) for (k, v) in x.iteritems())
+            return XmlDictObject({k: XmlDictObject.wrap(v) for (k, v) in x.items()})
         elif isinstance(x, list):
-            return [XmlDictObject.Wrap(v) for v in x]
+            return [XmlDictObject.wrap(v) for v in x]
         else:
             return x
 
     @staticmethod
-    def _UnWrap(x):
+    def __unwrap(x):
         if isinstance(x, dict):
-            return dict((k, XmlDictObject._UnWrap(v)) for (k, v) in x.iteritems())
+            return {k: XmlDictObject.unwrap(v) for (k, v) in x.items()}
         elif isinstance(x, list):
-            return [XmlDictObject._UnWrap(v) for v in x]
+            return [XmlDictObject.unwrap(v) for v in x]
         else:
             return x
         
-    def UnWrap(self):
+    def unwrap(self):
+        """ Recursively converts an XmlDictObject to a standard dictionary and returns the result.
         """
-        Recursively converts an XmlDictObject to a standard dictionary and returns the result.
-        """
+        return XmlDictObject.__unwrap(self)
 
-        return XmlDictObject._UnWrap(self)
 
 def _ConvertDictToXmlRecurse(parent, dictitem):
     assert type(dictitem) is not type([])
 
     if isinstance(dictitem, dict):
-        for (tag, child) in dictitem.iteritems():
+        for (tag, child) in dictitem.items():
             if str(tag) == '_text':
                 parent.text = str(child)
+
             elif type(child) is type([]):
                 # iterate through the array and convert
                 for listchild in child:
                     elem = ElementTree.Element(tag)
                     parent.append(elem)
                     _ConvertDictToXmlRecurse(elem, listchild)
+
             else:                
                 elem = ElementTree.Element(tag)
                 parent.append(elem)
                 _ConvertDictToXmlRecurse(elem, child)
     else:
         parent.text = str(dictitem)
-    
-def ConvertDictToXml(xmldict):
-    """
-    Converts a dictionary to an XML ElementTree Element 
-    """
 
+
+def ConvertDictToXml(xmldict):
+    """ Converts a dictionary to an XML ElementTree Element
+    """
     roottag = xmldict.keys()[0]
     root = ElementTree.Element(roottag)
     _ConvertDictToXmlRecurse(root, xmldict[roottag])
     return root
+
 
 def _ConvertXmlToDictRecurse(node, dictclass):
     nodedict = dictclass()
@@ -121,20 +120,20 @@ def _ConvertXmlToDictRecurse(node, dictclass):
     else:
         # if we don't have child nodes or attributes, just set the text
         nodedict = text
-        
+
     return nodedict
-        
+
+
 def ConvertXmlToDict(root, dictclass=XmlDictObject):
-    """
-    Converts an XML file or ElementTree Element to a dictionary
+    """ Converts an XML file or ElementTree Element to a dictionary
     """
 
     # If a string is passed in, try to open it as a file
-    if isinstance(root, basestring):
+    if isinstance(root, str):
         import cStringIO
         root = cStringIO.StringIO(root)
         root = ElementTree.parse(root).getroot()
     elif not ElementTree.iselement(root):
-        raise TypeError, 'Expected ElementTree.Element or file path string'
+        raise TypeError('Expected ElementTree.Element or file path string')
 
     return dictclass({root.tag: _ConvertXmlToDictRecurse(root, dictclass)})

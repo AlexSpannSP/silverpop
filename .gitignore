@@ -1,2 +1,4 @@
 local_test_config.py
 *.pyc
+.idea
+.python-version

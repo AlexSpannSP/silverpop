@@ -1,15 +1,17 @@
 import requests
 import logging
 
-from elementtree import ElementTree
+from xml.etree import ElementTree
 
-from xml import ConvertXmlToDict, ConvertDictToXml
-from exceptions import AuthException, ResponseException
+from silverpop.xml import ConvertXmlToDict, ConvertDictToXml
+from silverpop.exceptions import AuthException, ResponseException
+
 
 logger = logging.getLogger(__name__)
 
 
 class API(object):
+
     def __init__(self, url, username=None, password=None, sessionid=None):
         self.url = url
         self.username = username
@@ -17,28 +19,28 @@ class API(object):
         self.sessionid = sessionid if sessionid else self.login()
 
     def login(self):
-        '''Connects to Silverpop and attempts to retrieve a jsessionid for
-        secure request purposes.'''
+        """ Connects to Silverpop and attempts to retrieve a jsessionid for secure request purposes.
+        """
         if not (self.username and self.password):
             return
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = \
             {'Login': {'USERNAME': self.username, 'PASSWORD': self.password}}
 
-        sessionid = None
         response, success = self._submit_request(xml, retry=False, auth=True)
         sessionid = response.get('SESSIONID') if success else None
 
         if not sessionid:
             raise AuthException()
 
-        logger.info("New Silverpop sessionid acquired: %s" % sessionid)
+        logger.info("New Silverpop sessionid acquired: %s", sessionid)
 
         return sessionid
 
     def get_user_info(self, list_id, email):
-        '''Returns data from the specified list about the specified user.
-        The email address must be used as the primary key.'''
+        """ Returns data from the specified list about the specified user.
+            The email address must be used as the primary key.
+        """
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
             'SelectRecipientData': {
@@ -50,13 +52,18 @@ class API(object):
 
         return result
 
-    def add_recipient(self, list_id, email, data={}):
-        '''Mask for add_user'''
+    def add_recipient(self, list_id, email, data=None):
+        """ Mask for add_user
+        """
+        data = data or {}
         return self.add_user(list_id, email, data=data)
 
-    def add_user(self, list_id, email, data={}):
-        '''Adds a user to the specified list. Supports adding additional
-        attributes via passing a dictionary to the data parameter.'''
+    def add_user(self, list_id, email, data=None):
+        """ Adds a user to the specified list. Supports adding additional attributes
+            via passing a dictionary to the data parameter.
+        """
+        data = data or {}
+
         # Build the XML
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
@@ -68,19 +75,21 @@ class API(object):
                 ],
             }
         }
+
         xml['Envelope']['Body']['AddRecipient']['COLUMN'].extend(
-            self._data_to_columns(data))
+            self._data_to_columns(data)
+        )
 
         result, success = self._submit_request(xml)
 
         return success
 
-    def add_contact_to_contact_list(self, contact_list_id, contact_id=None,
-            data={}):
-        '''Adds a contact by contact_id or by performing a search based on
-        the data parameter.'''
-        assert contact_list_id or len(data) >= 1, \
-            'Contact_list_id or data parameter must be set'
+    def add_contact_to_contact_list(self, contact_list_id, contact_id=None, data=None):
+        """ Adds a contact by contact_id or by performing a search based on
+            the data parameter.
+        """
+        data = data or {}
+        assert contact_list_id or len(data) >= 1, 'Contact_list_id or data parameter must be set'
 
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
@@ -88,16 +97,13 @@ class API(object):
                 'CONTACT_LIST_ID': contact_list_id,
             }
         }
+
         if contact_id:
-            xml['Envelope']['Body']['AddContactToContactList'].update(
-                {
-                    'CONTACT_ID': contact_id
-                })
+            xml['Envelope']['Body']['AddContactToContactList'].update({'CONTACT_ID': contact_id})
+
         elif data:
-            xml['Envelope']['Body']['AddContactToContactList'].update(
-                {
-                    'COLUMN': self._data_to_columns(data)
-                })
+            xml['Envelope']['Body']['AddContactToContactList'].update({'COLUMN': self._data_to_columns(data)})
+
         result, success = self._submit_request(xml)
         return success
 
@@ -105,7 +111,8 @@ class API(object):
         self.remove_user(list_id, email)
 
     def remove_user(self, list_id, email):
-        '''Removes a user from the specified list.'''
+        """ Removes a user from the specified list.
+        """
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
             'RemoveRecipient': {
@@ -128,9 +135,10 @@ class API(object):
         self.update_user(list_id, email, data)
 
     def update_user(self, list_id, email, data):
-        '''Updates an existing user in Silverpop based on the email address as
-        the primary key. The data parameter is a dictionary that maps column
-        names to their new values.'''
+        """ Updates an existing user in Silverpop based on the email address as
+            the primary key. The data parameter is a dictionary that maps column
+            names to their new values.
+        """
 
         assert len(data) >= 1, \
             'Data parameter must contain at least one column/value pair'
@@ -150,7 +158,8 @@ class API(object):
         return success
 
     def opt_out_user(self, list_id, email):
-        '''Opts a user out on the specified list.'''
+        """ Opts a user out on the specified list.
+        """
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
             'OptOutRecipient': {
@@ -164,14 +173,15 @@ class API(object):
         return success
 
     def _sanitize_columns_in_api_result(self, data):
-        '''Post result parsing, the value of the columns key, if it exists,
-        will look something this format:
+        """ Post result parsing, the value of the columns key, if it exists,
+            will look something this format:
 
-        COLUMNS:[{'COLUMN':{'NAME':'<name>', 'VALUE':'<value>'}, ...}]. This
-        method replaces the value of the columns key with a dictionary that
-        looks like this:
+            COLUMNS:[{'COLUMN':{'NAME':'<name>', 'VALUE':'<value>'}, ...}]. This
+            method replaces the value of the columns key with a dictionary that
+            looks like this:
 
-        COLUMNS: {'<name>': <value>}'''
+            COLUMNS: {'<name>': <value>}
+        """
         columns = data.get('COLUMNS', {}).get('COLUMN', [])
 
         # Don't touch the original data if there aren't any columns.
@@ -190,12 +200,12 @@ class API(object):
         return data
 
     def _data_to_columns(self, data):
-        '''Iterates through a data dictionary, building a list of the format
-        [{'NAME':'<name>', 'VALUE':'<value>'},...]. The result can be set to
-        the COLUMN key in a dictionary that will be converted to XML for
-        Silverpop consumption.'''
-        assert callable(getattr(data, 'items', None)), \
-            'Data parameter must have a callable called items'
+        """ Iterates through a data dictionary, building a list of the format
+            [{'NAME':'<name>', 'VALUE':'<value>'},...]. The result can be set to
+            the COLUMN key in a dictionary that will be converted to XML for
+            Silverpop consumption.
+        """
+        assert callable(getattr(data, 'items', None)), 'Data parameter must have a callable called items'
 
         # Append the data dictionary to the column list
         columns = []
@@ -208,48 +218,42 @@ class API(object):
         return {'Envelope': {'Body': None}}
 
     def _submit_request(self, xml_dict, retry=True, auth=False, raw_xml=False):
-        '''Submits an XML payload to Silverpop, parses the result, and returns
-        it.'''
+        """ Submits an XML payload to Silverpop, parses the result, and returns it.
+        """
         if not raw_xml:
             xml = ElementTree.tostring(ConvertDictToXml(xml_dict))
         else:
             xml = xml_dict
-        url = '%s;jsessionid=%s' % (self.url, self.sessionid) if not auth \
-            else self.url
 
-        logger.debug("Sending request to: %s" % url)
+        url = '%s;jsessionid=%s' % (self.url, self.sessionid) if not auth else self.url
+
+        logger.debug("Sending request to: %s", url)
 
         # Connect to silverpop and get our response
-        response = requests.post(url, data=xml,
-                           headers={"Content-Type": "text/xml;charset=utf-8"})
+        response = requests.post(url, data=xml, headers={"Content-Type": "text/xml;charset=utf-8"})
+        response.raise_for_status()
 
-        logger.debug("Recieved response: %s" % response.content)
+        logger.debug("Recieved response: %s", response.content)
 
         response = ConvertXmlToDict(response.content, dict)
         response = response.get('Envelope', {}).get('Body')
 
         # Determine if the request succeeded
-        success = response.get('RESULT', {}).get('SUCCESS', 'false').lower()
-        success = False if success != 'true' and success != 'success' \
-            else True
+        success = response.get('RESULT', {}).get('SUCCESS', 'false').lower() in ('true', 'success')
 
         # Generate an exception if the API request failed.
         if not success:
             exc = ResponseException(response['Fault'])
-            error_id = \
-                exc.fault.get('detail', {}).get('error', {}).get(
-                    'errorid', None)
+            error_id = exc.fault.get('detail', {}).get('error', {}).get('errorid', None)
 
             # We want to try and resend the request on auth failures if retry
             # is enabled. 140 is the error_id for unauthenticated api attempts
             if error_id == str(140) and retry:
                 self.sessionid = self.login()
-                return self._submit_request(xml_dict, retry=False,
-                    secure=secure)
+                return self._submit_request(xml_dict, retry=False)
             elif auth:
                 pass
             else:
                 raise exc
 
-        return self._sanitize_columns_in_api_result(response['RESULT']), \
-            success
+        return self._sanitize_columns_in_api_result(response['RESULT']), success
