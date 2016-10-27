@@ -4,6 +4,8 @@
 #
 # I've modified it to make it work with python >=2.6 ~Thomas
 
+import io
+
 from xml.etree import ElementTree
 
 
@@ -23,7 +25,7 @@ class XmlDictObject(dict):
         self.__setitem__(item, value)
     
     def __str__(self):
-        if self.has_key('_text'):
+        if '_text' in self:
             return self.__getitem__('_text')
         else:
             return ''
@@ -80,7 +82,7 @@ def _ConvertDictToXmlRecurse(parent, dictitem):
 def ConvertDictToXml(xmldict):
     """ Converts a dictionary to an XML ElementTree Element
     """
-    roottag = xmldict.keys()[0]
+    roottag = list(xmldict.keys())[0]
     root = ElementTree.Element(roottag)
     _ConvertDictToXmlRecurse(root, xmldict[roottag])
     return root
@@ -96,7 +98,7 @@ def _ConvertXmlToDictRecurse(node, dictclass):
     for child in node:
         # recursively add the element's children
         newitem = _ConvertXmlToDictRecurse(child, dictclass)
-        if nodedict.has_key(child.tag):
+        if child.tag in nodedict:
             # found duplicate tag, force a list
             if type(nodedict[child.tag]) is type([]):
                 # append to existing list
@@ -127,13 +129,14 @@ def _ConvertXmlToDictRecurse(node, dictclass):
 def ConvertXmlToDict(root, dictclass=XmlDictObject):
     """ Converts an XML file or ElementTree Element to a dictionary
     """
+    if isinstance(root, bytes):
+        root = root.decode('utf-8')
 
     # If a string is passed in, try to open it as a file
     if isinstance(root, str):
-        import cStringIO
-        root = cStringIO.StringIO(root)
+        root = io.StringIO(root)
         root = ElementTree.parse(root).getroot()
     elif not ElementTree.iselement(root):
-        raise TypeError('Expected ElementTree.Element or file path string')
+        raise TypeError('Expected ElementTree.Element or file path string. Got: (%s, %s)' % (type(root), root))
 
     return dictclass({root.tag: _ConvertXmlToDictRecurse(root, dictclass)})

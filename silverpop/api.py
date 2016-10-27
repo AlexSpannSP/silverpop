@@ -24,8 +24,7 @@ class API(object):
         if not (self.username and self.password):
             return
         xml = self._get_xml_document()
-        xml['Envelope']['Body'] = \
-            {'Login': {'USERNAME': self.username, 'PASSWORD': self.password}}
+        xml['Envelope']['Body'] = {'Login': {'USERNAME': self.username, 'PASSWORD': self.password}}
 
         response, success = self._submit_request(xml, retry=False, auth=True)
         sessionid = response.get('SESSIONID') if success else None
