@@ -185,9 +185,11 @@ class API(object):
         :return:
         """
         xml = self._get_xml_document()
-        xml['Envelope']['Body']['ImportList'] = {
+        xml['Envelope']['Body'] = {
+            'ImportList': {
                 'MAP_FILE': map_filename,
                 'SOURCE_FILE': list_filename,
+            }
         }
 
         result, success = self._submit_request(xml)
@@ -206,9 +208,11 @@ class API(object):
             </Envelope>
         """
         xml = self._get_xml_document()
-        xml['Envelope']['Body']['ImportTable'] = {
+        xml['Envelope']['Body'] = {
+            'ImportTable': {
                 'MAP_FILE': map_filename,
                 'SOURCE_FILE': table_filename,
+            }
         }
 
         result, success = self._submit_request(xml)
@@ -258,7 +262,7 @@ class API(object):
         return columns
 
     def _get_xml_document(self):
-        return {'Envelope': {'Body': None}}
+        return {'Envelope': {'Body': {}}}
 
     def _submit_request(self, xml_dict, retry=True, auth=False, raw_xml=False):
         """ Submits an XML payload to Silverpop, parses the result, and returns it.
