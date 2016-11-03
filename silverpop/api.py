@@ -173,16 +173,15 @@ class API(object):
 
     def import_list(self, map_filename, list_filename):
         """ Imports a Relational Table using a CSV and an XML mapping file, previously uploaded.
-            <Envelope>
-            <Body>
-            <ImportList>
-            <MAP_FILE>list_import_map.xml</MAP_FILE>
-            <SOURCE_FILE>list_create.csv</SOURCE_FILE>
-            </ImportList>
-            </Body>
-            </Envelope>
 
-        :return:
+            <Envelope>
+                <Body>
+                    <ImportList>
+                        <MAP_FILE>list_import_map.xml</MAP_FILE>
+                        <SOURCE_FILE>list_create.csv</SOURCE_FILE>
+                    </ImportList>
+                </Body>
+            </Envelope>
         """
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
@@ -198,13 +197,14 @@ class API(object):
 
     def import_table(self, map_filename, table_filename):
         """ Imports a Relational Table using a CSV and an XML mapping file, previously uploaded.
+
             <Envelope>
-            <Body>
-            <ImportTable>
-            <MAP_FILE>table_import_map.xml</MAP_FILE>
-            <SOURCE_FILE>table_create.csv</SOURCE_FILE>
-            </ImportTable>
-            </Body>
+                <Body>
+                    <ImportTable>
+                        <MAP_FILE>table_import_map.xml</MAP_FILE>
+                        <SOURCE_FILE>table_create.csv</SOURCE_FILE>
+                    </ImportTable>
+                </Body>
             </Envelope>
         """
         xml = self._get_xml_document()
@@ -214,6 +214,40 @@ class API(object):
                 'SOURCE_FILE': table_filename,
             }
         }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def set_column_value(self, id, col_name, col_value=None):
+        """ Sets the value of a column in the provided Database or Query ID, to the provided value, or resetting it, if
+            the value is not provided. Example:
+
+            <Envelope>
+                <Body>
+                    <SetColumnValue>
+                        <LIST_ID>3126420</LIST_ID>
+                        <COLUMN_NAME>recency_sport_1</COLUMN_NAME>
+                        <COLUMN_VALUE>Hiking</COLUMN_VALUE>
+                        <ACTION>1</ACTION>
+                    </SetColumnValue>
+                </Body>
+            </Envelope>
+        """
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'SetColumnValue': {
+                'LIST_ID': id,
+                'COLUMN_NAME': col_name,
+                'ACTION': 0,
+            }
+        }
+
+        # if provided a col_value, then change the action (0 = Reset, 1 = Update) and add the COLUMN_VALUE field
+        if col_value is not None:
+            xml['Envelope']['Body']['SetColumnValue']['ACTION'] = 1
+            xml['Envelope']['Body']['SetColumnValue']['COLUMN_VALUE'] = col_value
 
         result, success = self._submit_request(xml)
 
