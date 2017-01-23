@@ -70,7 +70,7 @@ class API(object):
                 'LIST_ID': list_id,
                 'CREATED_FROM': 2,
                 'COLUMN': [
-                    {'NAME':'EMAIL', 'VALUE': email}
+                    {'NAME': 'EMAIL', 'VALUE': email}
                 ],
             }
         }
@@ -106,7 +106,7 @@ class API(object):
         result, success = self._submit_request(xml)
         return result, success
 
-    def remove_rcipient(self, list_id, email):
+    def remove_recipient(self, list_id, email):
         self.remove_user(list_id, email)
 
     def remove_user(self, list_id, email):
@@ -248,6 +248,59 @@ class API(object):
         if col_value is not None:
             xml['Envelope']['Body']['SetColumnValue']['ACTION'] = 1
             xml['Envelope']['Body']['SetColumnValue']['COLUMN_VALUE'] = col_value
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def raw_recipient_data_export(self, list_id, columns, start_date, end_date, filename=None):
+        """ Requests for a raw recipient data export from Silverpop, given start date, end date and a list of columns:
+
+            <Envelope>
+                <Body>
+                    <RawRecipientDataExport>
+                        <EVENT_DATE_START>01/01/2008 00:00:00</EVENT_DATE_START>
+                        <EVENT_DATE_END>01/31/2008 23:59:00</EVENT_DATE_END>
+                        <MOVE_TO_FTP/>
+                        <EXPORT_FORMAT>0</EXPORT_FORMAT>
+                        <EMAIL>admin@yourorg.com</EMAIL>
+                        <ALL_EVENT_TYPES/>
+                        <EXCLUDE_DELETED/>
+                        <COLUMNS>
+                            <COLUMN>
+                                <NAME>CustomerID</NAME>
+                            </COLUMN>
+                            <COLUMN>
+                                <NAME>Address</NAME>
+                            </COLUMN>
+                        </COLUMNS>
+                    </RawRecipientDataExport>
+                </Body>
+            </Envelope>
+        """
+
+        if filename is None:
+            filename = 'MerlynRawRecipientDataExport'
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'RawRecipientDataExport': {
+                'EVENT_DATE_START': start_date,
+                'EVENT_DATE_END': end_date,
+                'EXPORT_FORMAT': 0,
+                'LIST_ID': list_id,
+                'EXCLUDE_DELETED': true,
+                'INCLUDE_CHILDREN': true,
+                'OPENS': true,
+                'CLICKS': true,
+                'SENT': true,
+                'OPTOUTS': true,
+                'SOFT_BOUNCES': true,
+                'EXPORT_FILE_NAME': filename,
+                'MOVE_TO_FTP': true,
+                'COLUMNS': [{'COLUMN': {'NAME': c}} for c in columns]
+            }
+        }
 
         result, success = self._submit_request(xml)
 
