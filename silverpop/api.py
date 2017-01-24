@@ -6,9 +6,9 @@ from xml.etree import ElementTree
 from silverpop.xml import ConvertXmlToDict, ConvertDictToXml
 from silverpop.exceptions import AuthException, ResponseException
 
+RAW_DATA_EXPORT_DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
 
 logger = logging.getLogger(__name__)
-
 
 class API(object):
 
@@ -295,8 +295,8 @@ class API(object):
         if filename is None:
             filename = 'MerlynRawRecipientDataExport'
 
-        start_date_string = start_date.strftime('%m/%d/%Y %H:%M:%S')
-        end_date_string = end_date.strftime('%m/%d/%Y %H:%M:%S')
+        start_date_string = start_date.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+        end_date_string = end_date.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
 
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
@@ -312,6 +312,7 @@ class API(object):
                 'SENT': 1,
                 'OPTOUTS': 1,
                 'SOFT_BOUNCES': 1,
+                'HARD_BOUNCES': 1,
                 'EXPORT_FILE_NAME': filename,
                 'MOVE_TO_FTP': 1,
                 'COLUMNS': {'COLUMN': [{'NAME': c} for c in columns]}
