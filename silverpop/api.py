@@ -259,21 +259,34 @@ class API(object):
             <Envelope>
                 <Body>
                     <RawRecipientDataExport>
-                        <EVENT_DATE_START>01/01/2008 00:00:00</EVENT_DATE_START>
-                        <EVENT_DATE_END>01/31/2008 23:59:00</EVENT_DATE_END>
-                        <MOVE_TO_FTP/>
-                        <EXPORT_FORMAT>0</EXPORT_FORMAT>
-                        <EMAIL>admin@yourorg.com</EMAIL>
-                        <ALL_EVENT_TYPES/>
-                        <EXCLUDE_DELETED/>
+                        <INCLUDE_CHILDREN>1</INCLUDE_CHILDREN>
+                        <OPTOUTS>1</OPTOUTS>
+                        <MOVE_TO_FTP>1</MOVE_TO_FTP>
+                        <EXPORT_FILE_NAME>Export_file_name</EXPORT_FILE_NAME>
+                        <OPENS>1</OPENS>
+                        <EVENT_DATE_START>01/24/2017 00:00:00</EVENT_DATE_START>
+                        <CLICKS>1</CLICKS>
                         <COLUMNS>
                             <COLUMN>
-                                <NAME>CustomerID</NAME>
+                                <NAME>col1</NAME>
                             </COLUMN>
                             <COLUMN>
-                                <NAME>Address</NAME>
+                                <NAME>col2</NAME>
+                            </COLUMN>
+                            <COLUMN>
+                                <NAME>col3</NAME>
+                            </COLUMN>
+                            <COLUMN>
+                                <NAME>col4</NAME>
                             </COLUMN>
                         </COLUMNS>
+                        <EVENT_DATE_END>01/24/2017 23:59:59</EVENT_DATE_END>
+                        <LIST_ID>111111</LIST_ID>
+                        <LIST_ID>222222</LIST_ID>
+                        <EXCLUDE_DELETED>1</EXCLUDE_DELETED>
+                        <EXPORT_FORMAT>0</EXPORT_FORMAT>
+                        <SOFT_BOUNCES>1</SOFT_BOUNCES>
+                        <SENT>1</SENT>
                     </RawRecipientDataExport>
                 </Body>
             </Envelope>
@@ -282,23 +295,26 @@ class API(object):
         if filename is None:
             filename = 'MerlynRawRecipientDataExport'
 
+        start_date_string = start_date.strftime('%m/%d/%Y %H:%M:%S')
+        end_date_string = end_date.strftime('%m/%d/%Y %H:%M:%S')
+
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
             'RawRecipientDataExport': {
-                'EVENT_DATE_START': start_date,
-                'EVENT_DATE_END': end_date,
+                'EVENT_DATE_START': start_date_string,
+                'EVENT_DATE_END': end_date_string,
                 'EXPORT_FORMAT': 0,
                 'LIST_ID': list_id,
-                'EXCLUDE_DELETED': true,
-                'INCLUDE_CHILDREN': true,
-                'OPENS': true,
-                'CLICKS': true,
-                'SENT': true,
-                'OPTOUTS': true,
-                'SOFT_BOUNCES': true,
+                'EXCLUDE_DELETED': 1,
+                'INCLUDE_CHILDREN': 1,
+                'OPENS': 1,
+                'CLICKS': 1,
+                'SENT': 1,
+                'OPTOUTS': 1,
+                'SOFT_BOUNCES': 1,
                 'EXPORT_FILE_NAME': filename,
-                'MOVE_TO_FTP': true,
-                'COLUMNS': [{'COLUMN': {'NAME': c}} for c in columns]
+                'MOVE_TO_FTP': 1,
+                'COLUMNS': {'COLUMN': [{'NAME': c} for c in columns]}
             }
         }
 
