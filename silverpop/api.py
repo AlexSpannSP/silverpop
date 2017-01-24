@@ -290,6 +290,14 @@ class API(object):
                     </RawRecipientDataExport>
                 </Body>
             </Envelope>
+
+            :returns    ({
+                            'MAILING': {
+                                'FILE_PATH': 'MerlynRawRecipientDataExport Jan 24 2017 15-53-54 PM 369.zip',
+                                'JOB_ID': '97348251'},
+                            'SUCCESS': 'TRUE'
+                        },
+                        True)
         """
 
         if filename is None:
@@ -316,6 +324,41 @@ class API(object):
                 'EXPORT_FILE_NAME': filename,
                 'MOVE_TO_FTP': 1,
                 'COLUMNS': {'COLUMN': [{'NAME': c} for c in columns]}
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def get_job_status(self, job_id):
+        """
+        <Envelope>
+            <Body>
+                <GetJobStatus>
+                    <JOB_ID> 97211166 </JOB_ID>
+                </GetJobStatus>
+            </Body>
+        </Envelope>
+        :returns    ({
+                        'JOB_ID': '97348251',
+                        'JOB_STATUS': 'COMPLETE',
+                        'JOB_DESCRIPTION': 'Description,
+                        'PARAMETERS': [{
+                            'PARAMETER': {
+                                'NAME': 'name'
+                                'VALUE': 'value
+                            }
+                        }]
+                        'SUCCESS': 'TRUE'
+                    },
+                    True)
+        """
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'GetJobStatus': {
+                'JOB_ID': job_id
             }
         }
 
