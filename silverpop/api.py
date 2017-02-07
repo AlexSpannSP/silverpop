@@ -378,18 +378,22 @@ class API(object):
                 </GetSentMailingsForOrg>
             </Body>
         </Envelope>
-        :returns    ({
-                        'JOB_ID': '97348251',
-                        'JOB_STATUS': 'COMPLETE',
-                        'JOB_DESCRIPTION': 'Description,
-                        'PARAMETERS': [{
-                            'PARAMETER': {
-                                'NAME': 'name'
-                                'VALUE': 'value
-                            }
-                        }]
-                        'SUCCESS': 'TRUE'
-                    },
+        :returns    ({'Mailing': [
+                            {'ListId': '8329850',
+                            'ListName': 'Undelivered 1st Contact Query to edit',
+                            'MailingId': '16498162',
+                            'MailingName': 'Undelivered email template - 1st contact (16)',
+                            'NumSent': '12',
+                            'ParentListId': '1903827',
+                            'ParentTemplateId': '14597470',
+                            'ReportId': '960471871',
+                            'ScheduledTS': '2017-02-06 17:11:07.0',
+                            'SentTS': '2017-02-06 17:11:11.0',
+                            'Subject': 'Your SportPursuit Order - Product Returned',
+                            'UserName': 'Victoria Walton',
+                            'Visibility': 'Shared'}, ...
+                            ],
+                        'SUCCESS': 'TRUE'},
                     True)
         """
 
