@@ -366,6 +366,51 @@ class API(object):
 
         return result, success
 
+    def get_sent_mailings_for_org(self, start_date, end_date):
+        """
+        <Envelope>
+            <Body>
+                <GetSentMailingsForOrg>
+                    <DATE_START>02/06/2017 00:00:00</DATE_START>
+                    <DATE_END>02/06/2017 23:59:59</DATE_END>
+                    <EXCLUDE_ZERO_SENT/>
+                    <EXCLUDE_TEST_MAILINGS/>
+                </GetSentMailingsForOrg>
+            </Body>
+        </Envelope>
+        :returns    ({
+                        'JOB_ID': '97348251',
+                        'JOB_STATUS': 'COMPLETE',
+                        'JOB_DESCRIPTION': 'Description,
+                        'PARAMETERS': [{
+                            'PARAMETER': {
+                                'NAME': 'name'
+                                'VALUE': 'value
+                            }
+                        }]
+                        'SUCCESS': 'TRUE'
+                    },
+                    True)
+        """
+
+        start_date_string = start_date.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+        end_date_string = end_date.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'GetSentMailingsForOrg': {
+                'EVENT_DATE_START': start_date_string,
+                'EVENT_DATE_END': end_date_string,
+                'EXCLUDE_ZERO_SENT': 1,
+                'EXCLUDE_TEST_MAILINGS': 1,
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+
     def _sanitize_columns_in_api_result(self, data):
         """ Post result parsing, the value of the columns key, if it exists,
             will look something this format:
