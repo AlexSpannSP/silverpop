@@ -399,8 +399,8 @@ class API(object):
         xml = self._get_xml_document()
         xml['Envelope']['Body'] = {
             'GetSentMailingsForOrg': {
-                'EVENT_DATE_START': start_date_string,
-                'EVENT_DATE_END': end_date_string,
+                'DATE_START': start_date_string,
+                'DATE_END': end_date_string,
                 'EXCLUDE_ZERO_SENT': 1,
                 'EXCLUDE_TEST_MAILINGS': 1,
             }
@@ -409,7 +409,6 @@ class API(object):
         result, success = self._submit_request(xml)
 
         return result, success
-
 
     def _sanitize_columns_in_api_result(self, data):
         """ Post result parsing, the value of the columns key, if it exists,
