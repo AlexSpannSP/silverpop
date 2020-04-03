@@ -323,6 +323,8 @@ class API(object):
                 'HARD_BOUNCES': 1,
                 'EXPORT_FILE_NAME': filename,
                 'MOVE_TO_FTP': 1,
+                'MAIL_BLOCKS': 1,
+                'REPLY_ABUSE': 1,
                 'COLUMNS': {'COLUMN': [{'NAME': c} for c in columns]}
             }
         }
