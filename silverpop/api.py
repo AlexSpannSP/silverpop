@@ -501,3 +501,95 @@ class API(object):
                 raise exc
 
         return self._sanitize_columns_in_api_result(response['RESULT']), success
+
+    def get_scheduled_mailings_for_org(self):
+
+        """
+        <Envelope>
+		  <Body>
+			<GetSentMailingsForOrg>
+			  <SCHEDULED/>
+			  <EXCLUDE_TEST_MAILINGS/>
+			</GetSentMailingsForOrg>
+		  </Body>
+		</Envelope>
+        :returns    ({'Mailing': [
+                            {'ListId': '8329850',
+                            'ListName': 'Undelivered 1st Contact Query to edit',
+                            'MailingId': '16498162',
+                            'MailingName': 'Undelivered email template - 1st contact (16)',
+                            'NumSent': '12',
+                            'ParentListId': '1903827',
+                            'ParentTemplateId': '14597470',
+                            'ReportId': '960471871',
+                            'ScheduledTS': '2017-02-06 17:11:07.0',
+                            'SentTS': '2017-02-06 17:11:11.0',
+                            'Subject': 'Your SportPursuit Order - Product Returned',
+                            'UserName': 'Victoria Walton',
+                            'Visibility': 'Shared'}, ...
+                            ],
+                        'SUCCESS': 'TRUE'},
+                    True)
+        """
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'GetSentMailingsForOrg': {
+                'SCHEDULED': 1,
+                'EXCLUDE_TEST_MAILINGS': 1,
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def purge_data(self, target_id, source_id):
+
+        """
+        <Envelope>
+		  <Body>
+			<PurgeData>
+			  <TARGET_ID>7416984</TARGET_ID>
+			  <SOURCE_ID>11894739</SOURCE_ID>
+			</PurgeData>
+		  </Body>
+		</Envelope>
+        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '204693296'}, True)
+        """
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'PurgeData': {
+                'TARGET_ID': target_id,
+                'SOURCE_ID': source_id,
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def calculate_query(self, query_id):
+
+        """
+		<Envelope>
+			<Body>
+				<CalculateQuery>
+					<QUERY_ID>12503807</QUERY_ID>
+				</CalculateQuery>
+			</Body>
+		</Envelope>
+        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '204757320'}, True)
+        """
+
+        xml = self._get_xml_document()
+        xml['Envelope']['Body'] = {
+            'CalculateQuery': {
+                'QUERY_ID': query_id,
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
