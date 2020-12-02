@@ -226,7 +226,7 @@ class API(object):
             <Envelope>
                 <Body>
                     <SetColumnValue>
-                        <LIST_ID>3126420</LIST_ID>
+                        <LIST_ID>111111</LIST_ID>
                         <COLUMN_NAME>recency_sport_1</COLUMN_NAME>
                         <COLUMN_VALUE>Hiking</COLUMN_VALUE>
                         <ACTION>1</ACTION>
@@ -294,7 +294,7 @@ class API(object):
             :returns    ({
                             'MAILING': {
                                 'FILE_PATH': 'MerlynRawRecipientDataExport Jan 24 2017 15-53-54 PM 369.zip',
-                                'JOB_ID': '97348251'},
+                                'JOB_ID': '111111'},
                             'SUCCESS': 'TRUE'
                         },
                         True)
@@ -338,12 +338,12 @@ class API(object):
         <Envelope>
             <Body>
                 <GetJobStatus>
-                    <JOB_ID> 97211166 </JOB_ID>
+                    <JOB_ID> 111111 </JOB_ID>
                 </GetJobStatus>
             </Body>
         </Envelope>
         :returns    ({
-                        'JOB_ID': '97348251',
+                        'JOB_ID': '222222',
                         'JOB_STATUS': 'COMPLETE',
                         'JOB_DESCRIPTION': 'Description,
                         'PARAMETERS': [{
@@ -381,18 +381,18 @@ class API(object):
             </Body>
         </Envelope>
         :returns    ({'Mailing': [
-                            {'ListId': '8329850',
+                            {'ListId': '111111',
                             'ListName': 'Undelivered 1st Contact Query to edit',
-                            'MailingId': '16498162',
+                            'MailingId': '222222',
                             'MailingName': 'Undelivered email template - 1st contact (16)',
                             'NumSent': '12',
-                            'ParentListId': '1903827',
-                            'ParentTemplateId': '14597470',
-                            'ReportId': '960471871',
+                            'ParentListId': '333333',
+                            'ParentTemplateId': '444444',
+                            'ReportId': '555555',
                             'ScheduledTS': '2017-02-06 17:11:07.0',
                             'SentTS': '2017-02-06 17:11:11.0',
                             'Subject': 'Your SportPursuit Order - Product Returned',
-                            'UserName': 'Victoria Walton',
+                            'UserName': 'First Name Last Name',
                             'Visibility': 'Shared'}, ...
                             ],
                         'SUCCESS': 'TRUE'},
@@ -514,18 +514,18 @@ class API(object):
 		  </Body>
 		</Envelope>
         :returns    ({'Mailing': [
-                            {'ListId': '8329850',
+                            {'ListId': '111111',
                             'ListName': 'Undelivered 1st Contact Query to edit',
-                            'MailingId': '16498162',
+                            'MailingId': '222222',
                             'MailingName': 'Undelivered email template - 1st contact (16)',
                             'NumSent': '12',
-                            'ParentListId': '1903827',
-                            'ParentTemplateId': '14597470',
-                            'ReportId': '960471871',
+                            'ParentListId': '333333',
+                            'ParentTemplateId': '444444',
+                            'ReportId': '555555',
                             'ScheduledTS': '2017-02-06 17:11:07.0',
                             'SentTS': '2017-02-06 17:11:11.0',
                             'Subject': 'Your SportPursuit Order - Product Returned',
-                            'UserName': 'Victoria Walton',
+                            'UserName': 'First Name Last Name',
                             'Visibility': 'Shared'}, ...
                             ],
                         'SUCCESS': 'TRUE'},
@@ -550,12 +550,12 @@ class API(object):
         <Envelope>
 		  <Body>
 			<PurgeData>
-			  <TARGET_ID>7416984</TARGET_ID>
-			  <SOURCE_ID>11894739</SOURCE_ID>
+			  <TARGET_ID>111111</TARGET_ID>
+			  <SOURCE_ID>222222</SOURCE_ID>
 			</PurgeData>
 		  </Body>
 		</Envelope>
-        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '204693296'}, True)
+        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '333333'}, True)
         """
 
         xml = self._get_xml_document()
@@ -576,11 +576,11 @@ class API(object):
 		<Envelope>
 			<Body>
 				<CalculateQuery>
-					<QUERY_ID>12503807</QUERY_ID>
+					<QUERY_ID>111111</QUERY_ID>
 				</CalculateQuery>
 			</Body>
 		</Envelope>
-        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '204757320'}, True)
+        :returns    ({'SUCCESS': 'TRUE', 'JOB_ID': '222222'}, True)
         """
 
         xml = self._get_xml_document()
