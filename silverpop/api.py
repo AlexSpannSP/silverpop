@@ -595,7 +595,7 @@ class API(object):
 
         return result, success
 
-    def schedule_mailing(self, template_id, list_id, mailing_name, schedule_time, send_html=1, send_text=None, subject=None):
+    def schedule_mailing(self, template_id, list_id, mailing_name, schedule_time, send_html=1, send_text=None, subject=None, pre_processing_hours=None):
 
         """
         <Envelope>
@@ -636,7 +636,10 @@ class API(object):
             xml['Envelope']['Body']['ScheduleMailing']['SEND_TEXT'] = send_text
         
         if subject is not None:
-            xml['Envelope']['Body']['ScheduleMailing']['SUBJECT'] = subject            
+            xml['Envelope']['Body']['ScheduleMailing']['SUBJECT'] = subject 
+
+        if pre_processing_hours is not None and isinstance(pre_processing_hours, int) and pre_processing_hours <= 24 and pre_processing_hours >= 1:
+            xml['Envelope']['Body']['ScheduleMailing']['PRE_PROCESSING_HOURS'] = pre_processing_hours
         
         
         result, success = self._submit_request(xml)
