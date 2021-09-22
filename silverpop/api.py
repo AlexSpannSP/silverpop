@@ -593,3 +593,41 @@ class API(object):
         result, success = self._submit_request(xml)
 
         return result, success
+
+    def schedule_mailing(self, template_id, list_id, schedule_time, mailing_name=None, send_html=1, send_text=None, subject=None):
+
+        """
+        <Envelope>
+           <Body>
+              <ScheduleMailing>
+                 <TEMPLATE_ID>1000</TEMPLATE_ID>
+                 <LIST_ID>100</LIST_ID>
+                 <MAILING_NAME>New Mailing Name</MAILING_NAME>
+                 <SCHEDULED>10/13/2011 12:00:00 AM</SCHEDULED>
+                 <SEND_HTML />
+                 <SEND_TEXT />
+                 <SUBJECT>New subject</SUBJECT>
+                 <VISIBILITY>0</VISIBILITY>
+              </ScheduleMailing>
+           </Body>
+        </Envelope>
+        """
+
+        schedule_time_string = schedule_time.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+
+        xml = self._get_xml_document()
+
+        xml['Envelope']['Body'] = {
+            'ScheduleMailing': {
+                'TEMPLATE_ID': template_id,
+                'LIST_ID': list_id,
+                'MAILING_NAME': mailing_name,
+                'SEND_HTML': send_html,
+                'SEND_TEXT': send_text,
+                'subject': subject,
+            }
+        }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
