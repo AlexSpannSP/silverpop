@@ -7,6 +7,7 @@ from silverpop.xml import ConvertXmlToDict, ConvertDictToXml
 from silverpop.exceptions import AuthException, ResponseException
 
 RAW_DATA_EXPORT_DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
+SCHEDULE_MAILING_DATE_FORMAT = '%m/%d/%Y %I:%M:%S %p'
 
 logger = logging.getLogger(__name__)
 
@@ -594,7 +595,7 @@ class API(object):
 
         return result, success
 
-    def schedule_mailing(self, template_id, list_id, schedule_time, mailing_name=None, send_html=1, send_text=None, subject=None):
+    def schedule_mailing(self, template_id, list_id, mailing_name, schedule_time, send_html=1, send_text=None, subject=None):
 
         """
         <Envelope>
@@ -613,21 +614,31 @@ class API(object):
         </Envelope>
         """
 
-        schedule_time_string = schedule_time.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+        schedule_time_string = schedule_time.strftime(SCHEDULE_MAILING_DATE_FORMAT)
 
         xml = self._get_xml_document()
-
+        
         xml['Envelope']['Body'] = {
             'ScheduleMailing': {
                 'TEMPLATE_ID': template_id,
                 'LIST_ID': list_id,
                 'MAILING_NAME': mailing_name,
-                'SEND_HTML': send_html,
-                'SEND_TEXT': send_text,
-                'subject': subject,
+                'SCHEDULED': schedule_time_string,
+                'VISIBILITY': 1,
+                
             }
         }
-
+        
+        if send_html == 1:
+            xml['Envelope']['Body']['ScheduleMailing']['SEND_HTML'] = send_html
+            
+        if send_text == 1:
+            xml['Envelope']['Body']['ScheduleMailing']['SEND_TEXT'] = send_text
+        
+        if subject is not None:
+            xml['Envelope']['Body']['ScheduleMailing']['SUBJECT'] = subject            
+        
+        
         result, success = self._submit_request(xml)
 
         return result, success
