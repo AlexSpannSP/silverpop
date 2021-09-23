@@ -7,6 +7,7 @@ from silverpop.xml import ConvertXmlToDict, ConvertDictToXml
 from silverpop.exceptions import AuthException, ResponseException
 
 RAW_DATA_EXPORT_DATE_FORMAT = '%m/%d/%Y %H:%M:%S'
+SCHEDULE_MAILING_DATE_FORMAT = '%m/%d/%Y %I:%M:%S %p'
 
 logger = logging.getLogger(__name__)
 
@@ -590,6 +591,57 @@ class API(object):
             }
         }
 
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def schedule_mailing(self, template_id, list_id, mailing_name, schedule_time, send_html=1, send_text=None, subject=None, pre_processing_hours=None):
+
+        """
+        <Envelope>
+           <Body>
+              <ScheduleMailing>
+                 <TEMPLATE_ID>1000</TEMPLATE_ID>
+                 <LIST_ID>100</LIST_ID>
+                 <MAILING_NAME>New Mailing Name</MAILING_NAME>
+                 <SCHEDULED>10/13/2011 12:00:00 AM</SCHEDULED>
+                 <SEND_HTML />
+                 <SEND_TEXT />
+                 <SUBJECT>New subject</SUBJECT>
+                 <VISIBILITY>0</VISIBILITY>
+              </ScheduleMailing>
+           </Body>
+        </Envelope>
+        """
+
+        schedule_time_string = schedule_time.strftime(SCHEDULE_MAILING_DATE_FORMAT)
+
+        xml = self._get_xml_document()
+        
+        xml['Envelope']['Body'] = {
+            'ScheduleMailing': {
+                'TEMPLATE_ID': template_id,
+                'LIST_ID': list_id,
+                'MAILING_NAME': mailing_name,
+                'SCHEDULED': schedule_time_string,
+                'VISIBILITY': 1,
+                
+            }
+        }
+        
+        if send_html == 1:
+            xml['Envelope']['Body']['ScheduleMailing']['SEND_HTML'] = send_html
+            
+        if send_text == 1:
+            xml['Envelope']['Body']['ScheduleMailing']['SEND_TEXT'] = send_text
+        
+        if subject is not None:
+            xml['Envelope']['Body']['ScheduleMailing']['SUBJECT'] = subject 
+
+        if pre_processing_hours is not None and isinstance(pre_processing_hours, int) and pre_processing_hours <= 24 and pre_processing_hours >= 1:
+            xml['Envelope']['Body']['ScheduleMailing']['PRE_PROCESSING_HOURS'] = pre_processing_hours
+        
+        
         result, success = self._submit_request(xml)
 
         return result, success
