@@ -645,3 +645,62 @@ class API(object):
         result, success = self._submit_request(xml)
 
         return result, success
+
+    def select_recipient_data(self, list_id, email, customer_id):
+
+        """
+        <Envelope>
+          <Body>
+            <SelectRecipientData>
+            <LIST_ID>45654</LIST_ID>
+            <EMAIL>someone@adomain.com</EMAIL>
+            <COLUMN>
+              <NAME>Customer Id</NAME>
+              <VALUE>123-45-6789</VALUE>
+            </COLUMN>
+          </SelectRecipientData>
+         </Body>
+        </Envelope>
+        """
+
+        xml = self._get_xml_document()
+
+        xml['Envelope']['Body'] = {
+            'SelectRecipientData': {
+                'LIST_ID': list_id,
+                'EMAIL': email,
+                'COLUMN': [
+                    {'NAME': 'customer_id', 'VALUE': customer_id}
+                    ],
+                }
+            }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
+
+    def add_to_program(self, program_id, contact_id):
+
+        """
+            <Envelope>
+              <Body>
+                <AddContactToProgram>
+                  <PROGRAM_ID>56753246</PROGRAM_ID>
+                  <CONTACT_ID>7657657</CONTACT_ID>
+                </AddContactToProgram>
+              </Body>
+            </Envelope>
+        """
+
+        xml = self._get_xml_document()
+
+        xml['Envelope']['Body'] = {
+            'AddContactToProgram': {
+                'PROGRAM_ID': program_id,
+                'CONTACT_ID': contact_id,
+                }
+            }
+
+        result, success = self._submit_request(xml)
+
+        return result, success
