@@ -646,7 +646,7 @@ class API(object):
 
         return result, success
 
-    def selectrecipientdata(self, list_id, email, customer_id):
+    def select_recipient_data(self, list_id, email, customer_id):
 
         """
         <Envelope>
@@ -679,7 +679,7 @@ class API(object):
 
         return result, success
 
-    def addtoprogram(self, program_id, contact_id):
+    def add_to_program(self, program_id, contact_id):
 
         """
             <Envelope>
