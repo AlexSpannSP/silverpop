@@ -704,3 +704,32 @@ class API(object):
         result, success = self._submit_request(xml)
 
         return result, success
+
+    def delete_rt_rows(self, table_id, delete_before=None):
+
+        """
+            <Envelope>
+              <Body>
+                <PurgeTable>
+                  <TABLE_ID>123456</TABLE_ID>                  
+                  <DELETE_BEFORE>07/25/2011 12:12:11</DELETE_BEFORE>                  
+                </PurgeTable>
+              </Body>
+            </Envelope>
+        """
+
+        xml = self._get_xml_document()
+        
+        xml['Envelope']['Body'] = {
+            'PurgeTable': {
+                'TABLE_ID': table_id,
+            }
+        }
+        
+        if delete_before is not None:
+            delete_before_str = delete_before.strftime(RAW_DATA_EXPORT_DATE_FORMAT)
+            xml['Envelope']['Body']['PurgeTable']['DELETE_BEFORE'] = delete_before_str
+
+        result, success = self._submit_request(xml)
+
+        return result, success
